@@ -14,7 +14,6 @@ import {verifyToken} from "./middleware/auth.js";
 import authRoutes from "./routes/auth.js";
 import userRoutes from "./routes/users.js";
 import postsRoutes from "./routes/posts.js";
-import { create } from "domain";
 
 
 /* CONFIGURATIONS */

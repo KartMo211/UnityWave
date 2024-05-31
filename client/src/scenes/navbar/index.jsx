@@ -57,7 +57,7 @@ const NavBar = () => {
           sx={{
             "&:hover": {
               color: primaryLight,
-              cursor: "pointer",
+              cursor: "pgit ointer",
             },
           }}
         >

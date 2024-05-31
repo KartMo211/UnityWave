@@ -93,16 +93,27 @@ const Form = () => {
 
         console.log(response);
 
-        onSubmitProps.resetForm();
-
-        dispatch(
+        
+        try {
+          const friends = await axios.get(`/users/${response.data.user._id}/friends`, {
+            headers: { Authorization: `Bearer ${response.data.token}` },
+          });
+          // console.log(friends.data);
+          
+          dispatch(
             setLogin({
-                user:response.data.user,
-                token:response.data.token
+              user:{...response.data.user,friends:friends.data},
+              token:response.data.token
             })
-        );
-        navigate("/home");
+          );
 
+          onSubmitProps.resetForm();
+          navigate("/home");
+
+        } 
+        catch (err) {
+          console.log(err);
+        }
     }
     catch(err){
         console.log(err);

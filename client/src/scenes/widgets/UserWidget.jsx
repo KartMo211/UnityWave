@@ -1,82 +1,76 @@
 import {
-    ManageAccountsOutlined,
-    EditOutlined,
-    LocationOnOutlined,
-    WorkOutlineOutlined,
-  } from "@mui/icons-material";
-  import { Box, Typography, Divider, useTheme } from "@mui/material";
-  import UserImage from "components/UserImage";
-  import FlexBetween from "components/FlexBetween";
-  import WidgetWrapper from "components/WidgetWrapper";
-  import axios from "axios";
-  import { useSelector } from "react-redux";
-  import { useEffect, useState } from "react";
-  import { useNavigate } from "react-router-dom";
+  ManageAccountsOutlined,
+  EditOutlined,
+  LocationOnOutlined,
+  WorkOutlineOutlined,
+} from "@mui/icons-material";
+import { Box, Typography, Divider, useTheme } from "@mui/material";
+import UserImage from "components/UserImage";
+import FlexBetween from "components/FlexBetween";
+import WidgetWrapper from "components/WidgetWrapper";
+import axios from "axios";
+import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-  const UserWidget = ({userId,picturepath})=>{
-    const [user,setUser] = useState(null);
-    const [friends,setFriends] = useState([]);
-    const {palette} = useTheme();
-    const navigate = useNavigate();
-    const token = useSelector((state)=> state.value.token);
-    const dark = palette.neutral.dark;
-    const medium = palette.neutral.medium;
-    const main = palette.neutral.main;
+const UserWidget = ({ userId, picturepath }) => {
+  const [user, setUser] = useState(null);
+  const { palette } = useTheme();
+  const navigate = useNavigate();
+  const token = useSelector((state) => state.value.token);
+  const dark = palette.neutral.dark;
+  const medium = palette.neutral.medium;
+  const main = palette.neutral.main;
 
-    const getUser = async()=>{
-        try{
-            const response = await axios.get(`/users/${userId}`,{
-                headers:{Authorization: `Bearer ${token}`}
-            });
-             //neeed to set up the data for the users
-            // console.log(response.data);
+  const getUser = async () => {
+    try {
+      const response = await axios.get(`/users/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      //neeed to set up the data for the users
+      // console.log(response.data);
+      var user2 = response.data;
 
-            setUser(response.data);
+      try {
+        const response = await axios.get(`/users/${userId}/friends`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        //neeed to set up the data for the users
+        console.log(response.data);
+        
+        user2 = {...user2,friends:response.data};
 
-        }
-        catch(err){
-            console.log(err);
-        }
-       
+        // console.log(user2);
+        
+        setUser(user2);
+      } 
+      catch (err) {
+        console.log(err);
+      }
+    } catch (err) {
+      console.log(err);
     }
+  };
+  useEffect(() => {
+    getUser();
+  }, []);
 
-    const getUserFriends = async()=>{
-        try{
-            const response = await axios.get(`/users/${userId}/friends`,{
-                headers:{Authorization: `Bearer ${token}`}
-            });
-             //neeed to set up the data for the users
-            console.log(response.data);
-            setFriends(response.data);
-        }
-        catch(err){
-            console.log(err);
-        }
-    }
+  if (!user) {
+    return null;
+  }
 
-    useEffect(()=>{
-       getUser();
-       getUserFriends(); 
-       console.log(user);
-    },[]);
+  const {
+    firstname,
+    lastname,
+    location,
+    occupation,
+    viewedprofile,
+    impressions,
+    friends,
+  } = user;
 
-
-    if(!user){
-        return null;
-    }
-
-    const {
-        firstname,
-        lastname,
-        location,
-        occupation,
-        viewedprofile,
-        impressions,
-    } = user;
-
-
-    return (
-        <WidgetWrapper>
+  return (
+    <WidgetWrapper>
       {/* First Row */}
       <FlexBetween
         gap="0.5rem"
@@ -172,7 +166,7 @@ import {
         </FlexBetween>
       </Box>
     </WidgetWrapper>
-    );
-  }
+  );
+};
 
-  export default UserWidget;
+export default UserWidget;

@@ -3,12 +3,32 @@ import db from "../dbConnect.js";
 //Creating a post
 export const createPost = async (req,res) =>{
     try{
-        const {userId, description, picturePath} = req.body;
+        const {userId, description, picturepath} = req.body;
 
-        await db.query("INSERT INTO post(userid,description,picturepath) VALUES($1,$2,$3)", [userId,description,picturePath]);
+        await db.query("INSERT INTO post(userid,description,picturepath) VALUES($1,$2,$3)", [userId,description,picturepath]);
 
-        const result = await db.query("SELECT * FROM post");
+        const result = await db.query("SELECT post._id,post.userid,firstname,lastname,post.description,post.picturepath FROM post JOIN users ON post.userid = users._id");
         const post = result.rows;
+
+        const promises = post.map(async (index,i)=> {
+            const postId = index._id;
+            try{
+                const result = await db.query("SELECT userid FROM likes  WHERE post_id=$1",[postId]);
+                console.log(result.rows);
+                post[i] = {...index,likes: result.rows};
+                return index;
+
+            }   
+            catch(err){
+                console.log(err);
+            }
+        });
+
+        await Promise.all(promises);
+
+
+        console.log("hello");
+        console.log(post);
 
         res.status(201).json(post);
     }
@@ -20,8 +40,28 @@ export const createPost = async (req,res) =>{
 //Read all the posts
 export const getFeedPosts  = async(req,res) =>{
     try{
-        const result = await db.query("SELECT * FROM post");
+        const result = await db.query("SELECT post._id,post.userid,firstname,lastname,post.description,post.picturepath FROM post JOIN users ON post.userid = users._id");
         const post = result.rows;
+
+        const promises = post.map(async (index,i)=> {
+            const postId = index._id;
+            try{
+                const result = await db.query("SELECT userid FROM likes  WHERE post_id=$1",[postId]);
+                console.log(result.rows);
+                post[i] = {...index,likes: result.rows};
+                return index;
+
+            }   
+            catch(err){
+                console.log(err);
+            }
+        });
+
+        await Promise.all(promises);
+
+
+        console.log("hello");
+        console.log(post);
 
         res.status(200).json(post);
     }
@@ -33,8 +73,24 @@ export const getFeedPosts  = async(req,res) =>{
 export const getUserPosts = async (req,res) =>{
     try{
         const {userId} = req.params;
-        const result = await db.query("SELECT * FROM post WHERE userid = $1",[userId]);
+        const result = await db.query("SELECT SELECT post._id,post.userid,firstname,lastname,post.description,post.picturepath FROM post JOIN users ON post.userid = users._id WHERE userid = $1",[userId]);
         const post = result.rows;
+
+        const promises = post.map(async (index,i)=> {
+            const postId = index._id;
+            try{
+                const result = await db.query("SELECT userid FROM likes WHERE post_id=$1",[postId]);
+                console.log(result.rows);
+                post[i] = {...index,likes: result.rows};
+                return index;
+
+            }   
+            catch(err){
+                console.log(err);
+            }
+        });
+
+        await Promise.all(promises);
 
         res.status(201).json(post);
     }
@@ -60,9 +116,26 @@ export const likePost = async (req,res) =>{
             await db.query("INSERT INTO likes VALUES($1,$2)",[id,userId]);
         }
 
-        const likes = await db.query("SELECT * FROM likes WHERE userid = $1",[userId]);
+        const result2 = await db.query("SELECT SELECT post._id,post.userid,firstname,lastname,post.description,post.picturepath FROM post JOIN users ON user._id =post.userid WHERE userid = $1",[userId]);
+        const post = result2.rows;
 
-        res.status(201).json(likes.rows);
+        const promises = post.map(async (index,i)=> {
+            const postId = index._id;
+            try{
+                const result = await db.query("SELECT userid FROM likes WHERE post_id=$1",[postId]);
+                console.log(result.rows);
+                post[i] = {...index,likes: result.rows};
+                return index;
+
+            }   
+            catch(err){
+                console.log(err);
+            }
+        });
+
+        await Promise.all(promises);
+
+        res.status(201).json(post);
     }
     catch(err){
         res.status(409).json({message: err.message});
