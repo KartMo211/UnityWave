@@ -28,15 +28,13 @@ const PostsWidget = ({ userId, isProfile = false }) => {
 
   useEffect(() => {
 
-    console.log(posts);
-
     if (isProfile) {
       getUserPosts();
     } else {
       getPosts();
     }
 
-    // console.log(posts);
+    console.log(posts);
   }, []);
 
 

@@ -59,11 +59,16 @@ export const addRemoveFriend = async (req,res)=>{
                 return res.status(500).json({message:err.message});
             }
         }
+        try{
+            const result2 = await db.query("SELECT users._id,firstname,lastname,email,picturepath,location,occupation FROM friends JOIN users ON friends.userid = users._id WHERE friends._id = $1  ; ",[id]);
+            const formattedFriends = result2.rows;
 
-        const result2 = await db.query("SELECT users._id,firstname,lastname,email,picturepath,location,occupation FROM friends JOIN users ON friends.userid = users._id WHERE friends._id = $1  ; ",[id]);
-        const formattedFriends = result2.rows;
-
-        res.status(200).json(formattedFriends);
+            res.status(200).json(formattedFriends);
+        }
+        catch(err){
+            console.log(err);
+        }
+        
 
 
     }

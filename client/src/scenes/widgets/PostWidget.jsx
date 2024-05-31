@@ -11,7 +11,7 @@ import WidgetWrapper from "components/WidgetWrapper";
 import axios from "axios";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setPost } from "state";
+import { setPosts } from "state";
 import PostsWidget from "./PostsWidget";
 
 const PostWidget = ({
@@ -31,12 +31,11 @@ const PostWidget = ({
   const dispatch = useDispatch();
   const token = useSelector((state) => state.value.token);
   const loggedInUserId = useSelector((state) => state.value.user._id);
-  
-  // const isLiked = likes.find((index)=>index.userId==loggedInUserId);
-  // const likeCount = likes.length;
 
-  const isLiked = 1;
-  const likeCount = 3;
+  // console.log(likes)
+  
+  const isLiked = likes.find((index)=>index.userid===loggedInUserId);
+  const likeCount = likes.length;
 
   const { palette } = useTheme();
   const main = palette.neutral.main;
@@ -48,8 +47,11 @@ const PostWidget = ({
         Authorization: `Bearer ${token}`,
       }
     });
-    const updatedPost = await response.data;
-    dispatch(setPost({ post: updatedPost }));
+    const updatedPost = response.data;
+
+    console.log(updatedPost);
+
+    dispatch(setPosts({ posts: updatedPost }));
   };
 
   return (

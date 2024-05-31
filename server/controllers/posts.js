@@ -14,23 +14,21 @@ export const createPost = async (req,res) =>{
             const postId = index._id;
             try{
                 const result = await db.query("SELECT userid FROM likes  WHERE post_id=$1",[postId]);
-                console.log(result.rows);
-                post[i] = {...index,likes: result.rows};
-                return index;
-
+                // console.log(result.rows);
+                return {...index,likes: result.rows};
             }   
             catch(err){
                 console.log(err);
             }
         });
 
-        await Promise.all(promises);
+        const updatedPost = await Promise.all(promises);
 
 
-        console.log("hello");
-        console.log(post);
+        // console.log("hello");
+        // console.log(post);
 
-        res.status(201).json(post);
+        res.status(201).json(updatedPost);
     }
     catch(err){
         res.status(409).json({message: err.message});
@@ -47,23 +45,21 @@ export const getFeedPosts  = async(req,res) =>{
             const postId = index._id;
             try{
                 const result = await db.query("SELECT userid FROM likes  WHERE post_id=$1",[postId]);
-                console.log(result.rows);
-                post[i] = {...index,likes: result.rows};
-                return index;
-
+                // console.log(result.rows);
+                return {...index,likes: result.rows};
             }   
             catch(err){
                 console.log(err);
             }
         });
 
-        await Promise.all(promises);
+        const updatedPost = await Promise.all(promises);
 
 
-        console.log("hello");
-        console.log(post);
+        // console.log("hello");
+        // console.log(post);
 
-        res.status(200).json(post);
+        res.status(200).json(updatedPost);
     }
     catch(err){
         res.status(404).json({message: err.message});
@@ -80,19 +76,17 @@ export const getUserPosts = async (req,res) =>{
             const postId = index._id;
             try{
                 const result = await db.query("SELECT userid FROM likes WHERE post_id=$1",[postId]);
-                console.log(result.rows);
-                post[i] = {...index,likes: result.rows};
-                return index;
-
+                // console.log(result.rows);
+                return {...index,likes: result.rows};
             }   
             catch(err){
                 console.log(err);
             }
         });
 
-        await Promise.all(promises);
+        const updatedPost = await Promise.all(promises);
 
-        res.status(201).json(post);
+        res.status(201).json(updatedPost);
     }
     catch(err){
         res.status(409).json({message: err.message});
@@ -106,38 +100,44 @@ export const likePost = async (req,res) =>{
         const {id} = req.params;
         const {userId} = req.body;
 
+        console.log(id,userId);
+
         //check if it is liked and then return the likes
         const result = await db.query("SELECT * from likes WHERE post_id = $1 AND userid = $2",[id,userId]);
 
         if(result.rows.length==1){
-            await db.query("DELETE FROM likes WHERE post_id = $1 and userid = $2",[id,userId]);
+                await db.query("DELETE FROM likes WHERE post_id = $1 and userid = $2",[id,userId]);
+
         }
         else{
             await db.query("INSERT INTO likes VALUES($1,$2)",[id,userId]);
         }
 
-        const result2 = await db.query("SELECT SELECT post._id,post.userid,firstname,lastname,post.description,post.picturepath FROM post JOIN users ON user._id =post.userid WHERE userid = $1",[userId]);
+        const result2 = await db.query("SELECT post._id,post.userid,firstname,lastname,post.description,post.picturepath FROM post JOIN users ON post.userid = users._id");
         const post = result2.rows;
+
+        // console.log(post);
 
         const promises = post.map(async (index,i)=> {
             const postId = index._id;
             try{
                 const result = await db.query("SELECT userid FROM likes WHERE post_id=$1",[postId]);
-                console.log(result.rows);
-                post[i] = {...index,likes: result.rows};
-                return index;
-
+                // console.log(result.rows);
+                return {...index,likes: result.rows};
             }   
             catch(err){
                 console.log(err);
             }
         });
 
-        await Promise.all(promises);
+        const updatedPost = await Promise.all(promises);
 
-        res.status(201).json(post);
+        // console.log(updatedPost);
+
+        res.status(201).json(updatedPost);
     }
     catch(err){
+        console.log(err);
         res.status(409).json({message: err.message});
     }
 }
