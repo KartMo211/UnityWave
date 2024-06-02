@@ -31,15 +31,18 @@ const PostWidget = ({
   const dispatch = useDispatch();
   const token = useSelector((state) => state.value.token);
   const loggedInUserId = useSelector((state) => state.value.user._id);
-
-  // console.log(likes)
-  
-  const isLiked = likes.find((index)=>index.userid===loggedInUserId);
-  const likeCount = likes.length;
-
   const { palette } = useTheme();
   const main = palette.neutral.main;
   const primary = palette.primary.main;
+
+  // console.log(likes);
+  
+  if(likes==null) return;
+
+  const isLiked = likes.find((index)=>index.userid===loggedInUserId);
+  const likeCount = likes.length;
+
+  
 
   const patchLike = async () => {
     const response = await axios.patch(`/posts/${postId}/like`,{userId:loggedInUserId},{
@@ -49,7 +52,7 @@ const PostWidget = ({
     });
     const updatedPost = response.data;
 
-    console.log(updatedPost);
+    // console.log(updatedPost);
 
     dispatch(setPosts({ posts: updatedPost }));
   };

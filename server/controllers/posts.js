@@ -69,15 +69,15 @@ export const getFeedPosts  = async(req,res) =>{
 export const getUserPosts = async (req,res) =>{
     try{
         const {userId} = req.params;
-        const result = await db.query("SELECT SELECT post._id,post.userid,firstname,lastname,post.description,post.picturepath FROM post JOIN users ON post.userid = users._id WHERE userid = $1",[userId]);
+        const result = await db.query("SELECT post._id,post.userid,firstname,lastname,post.description,post.picturepath FROM post JOIN users ON post.userid = users._id WHERE post.userid = $1",[userId]);
         const post = result.rows;
 
         const promises = post.map(async (index,i)=> {
             const postId = index._id;
             try{
-                const result = await db.query("SELECT userid FROM likes WHERE post_id=$1",[postId]);
+                const result2 = await db.query("SELECT userid FROM likes WHERE post_id=$1",[postId]);
                 // console.log(result.rows);
-                return {...index,likes: result.rows};
+                return {...index,likes: result2.rows};
             }   
             catch(err){
                 console.log(err);
@@ -89,6 +89,7 @@ export const getUserPosts = async (req,res) =>{
         res.status(201).json(updatedPost);
     }
     catch(err){
+        console.log(err);
         res.status(409).json({message: err.message});
     }
 }
